@@ -31,7 +31,7 @@ fn main() -> Result<()> {
     let mut handle = stdin.lock();
     handle.read_line(&mut buffer)?;
     write_to_file(
-        decompress(decode_hex(&buffer.trim_end())?)?
+        decompress(decode_hex(buffer.trim_end())?)?
         , "decompressed.file")?;
     Ok(())
 }
@@ -52,7 +52,7 @@ pub fn encode_hex(bytes: &[u8]) -> String {
     s
 }
 pub fn write_to_file(data: Vec<u8>, path: &str) -> Result<()> {
-    let mut file = File::create(&path)?;
+    let mut file = File::create(path)?;
     file.write_all(&data).unwrap();
     Ok(())
 }
