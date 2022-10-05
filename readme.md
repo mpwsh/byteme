@@ -1,5 +1,5 @@
 ## Description
-Compress/Decompress, Encode and Decode any file to a hex string.
+Compress/Decompress, Encode and Decode any file to a hex string.  
 Useful to store binaries in text format, for NFC cards/stickers/keychains or anywhere you want.
 
 ## Build
