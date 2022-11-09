@@ -1,4 +1,3 @@
-#![feature(byte_slice_trim_ascii)]
 use anyhow::Result;
 use core::str;
 use flate2::read::ZlibDecoder;
