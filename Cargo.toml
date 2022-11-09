@@ -1,12 +1,13 @@
 [package]
 name = "byteme"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "apache-2.0"
 authors = ["mpw <x@mpw.sh>"]
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0"
 atty = "0.2.14"
 flate2 = "1.0.24"
+itertools = "0.10.5"
+z85 = "3.0.5"
