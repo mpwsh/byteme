@@ -1,3 +1,4 @@
+#![feature(byte_slice_trim_ascii)]
 use anyhow::Result;
 use core::str;
 use flate2::read::ZlibDecoder;
@@ -6,7 +7,7 @@ use flate2::Compression;
 use itertools::Itertools;
 use std::env;
 use std::fs::File;
-use std::io::{self, BufRead};
+use std::io;
 use std::io::{Read, Write};
 use std::path::Path;
 use z85::*;
@@ -26,7 +27,7 @@ fn main() -> Result<()> {
         };
     } else {
         println!(
-            "
+        "
         Provided file path will be compressed encoded to z85.
         Result string will be sent stdout.
         To convert back to original file read instructions below.
@@ -43,11 +44,12 @@ fn main() -> Result<()> {
     Ok(())
 }
 fn from_raw(arg: &str) -> Result<()> {
-    let mut buffer = String::new();
+    let mut buffer = Vec::new();
     let stdin = io::stdin();
     let mut handle = stdin.lock();
-    handle.read_line(&mut buffer)?;
-    write_to_file(decompress(decode(buffer.trim_end())?)?, arg)?;
+    handle.read_to_end(&mut buffer)?;
+    let raw = str::from_utf8(&buffer)?.replace('\n',"");
+    write_to_file(decompress(decode(raw)?)?, arg)?;
     Ok(())
 }
 
