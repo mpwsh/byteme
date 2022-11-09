@@ -20,14 +20,14 @@ echo "This is a test" >> raw.txt
 #Process
 ❯ ./target/release/byteme raw.txt
 #Output
-78da0bc9c82c5600a2448592d4e2122e0029730500
+C?JLE:sHu(Qc%Y#!z.8[04z%)###00
 ```
 
 Decode z85 and decompress back to original file
 
 ```bash
 #Decode
-❯ echo "78da0bc9c82c5600a2448592d4e2122e0029730500" | ./target/release/byteme out.txt
+❯ echo 'C?JLE:sHu(Qc%Y#!z.8[04z%)###00' | ./target/release/byteme out.txt
 #Check your new file
 ❯ cat out.txt
 This is a test
