@@ -90,11 +90,9 @@ fn read_from_file(path: &str) -> Result<Vec<u8>> {
 }
 
 fn compress(bytes: Vec<u8>) -> Result<Vec<u8>> {
-    println!("compressing");
     let mut e = ZlibEncoder::new(Vec::new(), Compression::best());
     e.write_all(&bytes)?;
     let compressed_bytes = e.finish()?;
-    println!("done compressing");
     Ok(compressed_bytes)
 }
 fn decompress(bytes: Vec<u8>) -> Result<Vec<u8>> {
