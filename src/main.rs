@@ -7,11 +7,11 @@ use itertools::Itertools;
 use std::env;
 use std::fs::File;
 use std::io;
-use std::io::{Read, Write};
+use std::io::{stdout, Read, Write};
 use std::path::Path;
 use z85::*;
 
-const CHUNK_SIZE: usize = 2048;
+const CHUNK_SIZE: usize = 1024 * 100;
 
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
@@ -26,7 +26,7 @@ fn main() -> Result<()> {
         };
     } else {
         println!(
-        "
+            "
         Provided file path will be compressed encoded to z85.
         Result string will be sent stdout.
         To convert back to original file read instructions below.
@@ -47,7 +47,7 @@ fn from_raw(arg: &str) -> Result<()> {
     let stdin = io::stdin();
     let mut handle = stdin.lock();
     handle.read_to_end(&mut buffer)?;
-    let raw = str::from_utf8(&buffer)?.replace('\n',"");
+    let raw = str::from_utf8(&buffer)?.replace('\n', "");
     write_to_file(decompress(decode(raw)?)?, arg)?;
     Ok(())
 }
@@ -55,19 +55,22 @@ fn from_raw(arg: &str) -> Result<()> {
 fn to_raw(arg: &str) -> Result<()> {
     match Path::new(arg).exists() {
         true => {
-            let bytes = encode(&compress(read_from_file(arg)?)?);
-            let result: String = str::from_utf8(
-                bytes
-                    .chars()
-                    .chunks(CHUNK_SIZE)
-                    .into_iter()
-                    .map(|x| x.collect())
-                    .collect::<Vec<String>>()
-                    .join("\n")
-                    .as_bytes(),
-            )?
-            .to_string();
-            println!("{}", result);
+            let encoded = encode(&compress(read_from_file(arg)?)?);
+            let mut lock = stdout().lock();
+            write!(
+                lock,
+                "{}",
+                str::from_utf8(
+                    encoded
+                        .chars()
+                        .chunks(CHUNK_SIZE)
+                        .into_iter()
+                        .map(|x| x.collect())
+                        .collect::<Vec<String>>()
+                        .join("\n")
+                        .as_bytes(),
+                )?
+            )?;
         }
         false => println!("File doesn't exist. Check path"),
     };
@@ -87,9 +90,11 @@ fn read_from_file(path: &str) -> Result<Vec<u8>> {
 }
 
 fn compress(bytes: Vec<u8>) -> Result<Vec<u8>> {
+    println!("compressing");
     let mut e = ZlibEncoder::new(Vec::new(), Compression::best());
     e.write_all(&bytes)?;
     let compressed_bytes = e.finish()?;
+    println!("done compressing");
     Ok(compressed_bytes)
 }
 fn decompress(bytes: Vec<u8>) -> Result<Vec<u8>> {
