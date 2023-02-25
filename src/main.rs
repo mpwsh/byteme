@@ -1,14 +1,9 @@
 use anyhow::Result;
 use core::str;
-use flate2::read::ZlibDecoder;
-use flate2::write::ZlibEncoder;
-use flate2::Compression;
+use flate2::{read::ZlibDecoder, write::ZlibEncoder, Compression};
 use itertools::Itertools;
-use std::env;
-use std::fs::File;
-use std::io;
-use std::io::{stdout, Read, Write};
-use std::path::Path;
+use std::{env, fs::File, path::Path};
+use std::io::{self, stdout, Read, Write};
 use z85::*;
 
 const CHUNK_SIZE: usize = 1024 * 100;
@@ -16,7 +11,6 @@ const CHUNK_SIZE: usize = 1024 * 100;
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     let tty = atty::is(atty::Stream::Stdin);
-    //Usage
     if let Some(arg) = args.get(1) {
         match tty {
             //Decode + Decompress + Save to file
@@ -26,7 +20,7 @@ fn main() -> Result<()> {
         };
     } else {
         println!(
-            "
+        "
         Provided file path will be compressed encoded to z85.
         Result string will be sent stdout.
         To convert back to original file read instructions below.
@@ -101,3 +95,4 @@ fn decompress(bytes: Vec<u8>) -> Result<Vec<u8>> {
     d.read_to_end(&mut b)?;
     Ok(b)
 }
+
