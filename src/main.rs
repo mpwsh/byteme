@@ -2,8 +2,8 @@ use anyhow::Result;
 use core::str;
 use flate2::{read::ZlibDecoder, write::ZlibEncoder, Compression};
 use itertools::Itertools;
-use std::{env, fs::File, path::Path};
 use std::io::{self, stdout, Read, Write};
+use std::{env, fs::File, path::Path};
 use z85::*;
 
 const CHUNK_SIZE: usize = 1024 * 100;
@@ -20,7 +20,7 @@ fn main() -> Result<()> {
         };
     } else {
         println!(
-        "
+            "
         Provided file path will be compressed encoded to z85.
         Result string will be sent stdout.
         To convert back to original file read instructions below.
@@ -38,18 +38,19 @@ fn main() -> Result<()> {
 }
 fn from_raw(arg: &str) -> Result<()> {
     let mut buffer = Vec::new();
-    let stdin = io::stdin();
-    let mut handle = stdin.lock();
-    handle.read_to_end(&mut buffer)?;
+    io::stdin().lock().read_to_end(&mut buffer)?;
+
     let raw = str::from_utf8(&buffer)?.replace('\n', "");
-    write_to_file(decompress(decode(raw)?)?, arg)?;
-    Ok(())
+    let decompressed = decompress(decode(raw)?)?;
+
+    write_file(decompressed, arg)
 }
 
 fn to_raw(arg: &str) -> Result<()> {
+    let compressed = compress(read_file(arg)?)?;
     match Path::new(arg).exists() {
         true => {
-            let encoded = encode(&compress(read_from_file(arg)?)?);
+            let encoded = encode(compressed);
             let mut lock = stdout().lock();
             write!(
                 lock,
@@ -71,12 +72,11 @@ fn to_raw(arg: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn write_to_file(data: Vec<u8>, path: &str) -> Result<()> {
+pub fn write_file(data: Vec<u8>, path: &str) -> Result<()> {
     let mut file = File::create(path)?;
-    file.write_all(&data).unwrap();
-    Ok(())
+    Ok(file.write_all(&data)?)
 }
-fn read_from_file(path: &str) -> Result<Vec<u8>> {
+fn read_file(path: &str) -> Result<Vec<u8>> {
     let mut data = Vec::new();
     let mut f = File::open(path)?;
     f.read_to_end(&mut data)?;
@@ -95,4 +95,3 @@ fn decompress(bytes: Vec<u8>) -> Result<Vec<u8>> {
     d.read_to_end(&mut b)?;
     Ok(b)
 }
-

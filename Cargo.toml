@@ -8,6 +8,6 @@ authors = ["mpw <x@mpw.sh>"]
 [dependencies]
 anyhow = "1.0"
 atty = "0.2.14"
-flate2 = "1.0.24"
+flate2 = "1.0.26"
 itertools = "0.10.5"
 z85 = "3.0.5"
