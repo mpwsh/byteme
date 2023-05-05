@@ -3,7 +3,7 @@ use core::str;
 use flate2::{read::ZlibDecoder, write::ZlibEncoder, Compression};
 use itertools::Itertools;
 use std::io::{self, stdout, Read, Write};
-use std::{env, fs::File, path::Path};
+use std::{env, fs::File};
 use z85::*;
 
 const CHUNK_SIZE: usize = 1024 * 100;
@@ -43,13 +43,16 @@ fn from_raw(arg: &str) -> Result<()> {
     let raw = str::from_utf8(&buffer)?.replace('\n', "");
     let decompressed = decompress(decode(raw)?)?;
 
-    write_file(decompressed, arg)
+    let mut file = File::create(arg)?;
+    Ok(file.write_all(&decompressed)?)
 }
 
 fn to_raw(arg: &str) -> Result<()> {
-    let compressed = compress(read_file(arg)?)?;
-    match Path::new(arg).exists() {
-        true => {
+    let mut data = Vec::new();
+    match File::open(arg) {
+        Ok(mut f) => {
+            f.read_to_end(&mut data)?;
+            let compressed = compress(data)?;
             let encoded = encode(compressed);
             let mut lock = stdout().lock();
             write!(
@@ -67,20 +70,9 @@ fn to_raw(arg: &str) -> Result<()> {
                 )?
             )?;
         }
-        false => println!("File doesn't exist. Check path"),
+        Err(e) => { println!("Error while reading file: {}", e); std::process::exit(1) }
     };
     Ok(())
-}
-
-pub fn write_file(data: Vec<u8>, path: &str) -> Result<()> {
-    let mut file = File::create(path)?;
-    Ok(file.write_all(&data)?)
-}
-fn read_file(path: &str) -> Result<Vec<u8>> {
-    let mut data = Vec::new();
-    let mut f = File::open(path)?;
-    f.read_to_end(&mut data)?;
-    Ok(data)
 }
 
 fn compress(bytes: Vec<u8>) -> Result<Vec<u8>> {
