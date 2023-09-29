@@ -1,9 +1,13 @@
-use anyhow::Result;
 use core::str;
+use std::{
+    env,
+    fs::File,
+    io::{self, stdout, Read, Write},
+};
+
+use anyhow::Result;
 use flate2::{read::ZlibDecoder, write::ZlibEncoder, Compression};
 use itertools::Itertools;
-use std::io::{self, stdout, Read, Write};
-use std::{env, fs::File};
 use z85::*;
 
 const CHUNK_SIZE: usize = 1024 * 100;
@@ -69,8 +73,11 @@ fn to_raw(arg: &str) -> Result<()> {
                         .as_bytes(),
                 )?
             )?;
-        }
-        Err(e) => { println!("Error while reading file: {}", e); std::process::exit(1) }
+        },
+        Err(e) => {
+            println!("Error while reading file: {}", e);
+            std::process::exit(1)
+        },
     };
     Ok(())
 }
