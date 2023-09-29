@@ -104,7 +104,8 @@ jobs:
       - uses: actions/checkout@master
         with:
           lfs: true
-      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - run: git remote -v
+      - run: git fetch --depth=1
       - id: get_previous_version
         run: echo ::set-output name=PREVIOUS_VERSION::$(git describe --tags "$(git rev-list --tags --max-count=1)")
         shell: bash
