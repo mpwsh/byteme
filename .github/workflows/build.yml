@@ -112,7 +112,7 @@ jobs:
       - id: semvers
         uses: WyriHaximus/github-action-next-semvers@master
         with:
-          version: '${{ steps.get_previous_version.outputs.PREVIOUS_VERSION }}'
+          version: '${{ steps.get_previous_version.outputs.PREVIOUS_VERSION || ''0.0.0'' }}'
       - run: mkdir -p ./version
       - run: echo "$VERSION" >./version/version
         env:
