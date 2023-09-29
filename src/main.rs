@@ -10,13 +10,13 @@ const CHUNK_SIZE: usize = 1024 * 100;
 
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
-    let tty = atty::is(atty::Stream::Stdin);
+    let tty = !atty::is(atty::Stream::Stdin);
     if let Some(arg) = args.get(1) {
         match tty {
             //Decode + Decompress + Save to file
-            false => from_raw(arg)?,
+            true => from_raw(arg)?,
             //Read from path + Compress + Encode
-            true => to_raw(arg)?,
+            false => to_raw(arg)?,
         };
     } else {
         println!(
