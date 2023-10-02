@@ -42,6 +42,7 @@ jobs:
       matrix:
         include:
           - os: macos-latest
+          - os: macos-latest-large
           - os: ubuntu-latest
           - os: windows-latest
     steps:
@@ -140,6 +141,9 @@ jobs:
           - os: macos-latest
             target: x86_64-apple-darwin
             suffix: ''
+          - os: macos-large-latest
+            target: aarch64-apple-darwin
+            suffix: ''
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             suffix: ''
@@ -154,7 +158,7 @@ jobs:
         with:
           name: version
       - id: get_version
-        run: 'echo ::set-output "name=VERSION::$(cat ./version/version)"'
+        run: echo ::set-output "name=VERSION::$(IFS=\=;cat Cargo.toml | grep version | head -n1 | awk {'print $3'})"
         shell: bash
       - uses: actions/cache@v1
         with:
@@ -193,40 +197,8 @@ jobs:
           lfs: true
       - uses: actions/download-artifact@master
         with:
-          name: version
-     #- id: get_version
-     #  run: 'echo ::set-output name=VERSION::$(cat ./version/version)'
-     #  shell: bash
-      - uses: actions/download-artifact@master
-        with:
-          name: ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu
-          path: ./x86_64-unknown-linux-gnu
-
-      - uses: actions/download-artifact@master
-        with:
-          name: ${{ env.REPOSITORY }}-x86_64-apple-darwin
-          path: ./x86_64-apple-darwin
-
-      - uses: actions/download-artifact@master
-        with:
-          name: ${{ env.REPOSITORY }}-x86_64-pc-windows-msvc
-          path: ./x86_64-pc-windows-msvc
-     #- uses: actions-rs/toolchain@v1
-     #  with:
-     #    profile: minimal
-     #    toolchain: stable
-     #    override: true
-     #- uses: actions-rs/cargo@v1
-     #  with:
-     #    command: install
-     #    args: 'toml-cli'
-     #- run: |
-     #    TEMP_FILE="$(mktemp)"
-     #    toml set Cargo.toml package.version "${VERSION:-1.0.0}" > "$TEMP_FILE"
-     #    mv "$TEMP_FILE" Cargo.toml
-     #  shell: bash
-     #  env:
-     #    VERSION: '${{ steps.get_version.outputs.VERSION }}'
+          name: ${{ env.REPOSITORY }}-${{ matrix.target }}
+          path: ./${{ matrix.target }}
       - id: create_release
         uses: actions/create-release@v1.0.0
         env:
@@ -244,24 +216,6 @@ jobs:
           GITHUB_TOKEN: '${{ secrets.ACTIONS_TOKEN }}'
         with:
           upload_url: '${{ steps.create_release.outputs.upload_url }}'
-          asset_path: ./x86_64-unknown-linux-gnu/${{ env.REPOSITORY }}
-          asset_name: ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu
-          asset_content_type: application/octet-stream
-
-      - uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: '${{ secrets.ACTIONS_TOKEN }}'
-        with:
-          upload_url: '${{ steps.create_release.outputs.upload_url }}'
-          asset_path: ./x86_64-apple-darwin/${{ env.REPOSITORY }}
-          asset_name: ${{ env.REPOSITORY }}-x86_64-apple-darwin
-          asset_content_type: application/octet-stream
-
-      - uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: '${{ secrets.ACTIONS_TOKEN }}'
-        with:
-          upload_url: '${{ steps.create_release.outputs.upload_url }}'
-          asset_path: ./x86_64-pc-windows-msvc/${{ env.REPOSITORY }}.exe
-          asset_name: ${{ env.REPOSITORY }}-x86_64-pc-windows-msvc.exe
+          asset_path: ./${{ matrix.target }}/${{ env.REPOSITORY }}
+          asset_name: ${{ env.REPOSITORY }}-${{ matrix.target }}
           asset_content_type: application/octet-stream
