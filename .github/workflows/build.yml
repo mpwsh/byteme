@@ -9,6 +9,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  REPOSITORY: ${{ github.event.repository.name }}
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -148,9 +150,6 @@ jobs:
       - uses: actions/checkout@master
         with:
           lfs: true
-      - id: get_repository_name
-        run: echo ::set-output name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")
-        shell: bash
       - uses: actions/download-artifact@master
         with:
           name: version
@@ -177,14 +176,13 @@ jobs:
       - uses: actions-rs/cargo@v1
         env:
           VERSION: '${{ steps.get_version.outputs.VERSION }}'
-          REPOSITORY_NAME: '${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}'
         with:
           command: build
           args: '--release'
       - uses: actions/upload-artifact@master
         with:
-          name: ${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-${{ matrix.target }}
-          path: ./target/release/${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}${{ matrix.suffix }}
+          name: ${{ env.REPOSITORY }}-${{ matrix.target }}
+          path: ./target/release/${{ env.REPOSITORY }}${{ matrix.suffix }}
   release:
     needs:
       - build
@@ -193,9 +191,6 @@ jobs:
       - uses: actions/checkout@master
         with:
           lfs: true
-      - id: get_repository_name
-        run: echo ::set-output name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")
-        shell: bash
       - uses: actions/download-artifact@master
         with:
           name: version
@@ -204,13 +199,13 @@ jobs:
         shell: bash
       - uses: actions/download-artifact@master
         with:
-          name: ${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-x86_64-unknown-linux-gnu
+          name: ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu
       - uses: actions/download-artifact@master
         with:
-          name: ${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-x86_64-apple-darwin
+          name: ${{ env.REPOSITORY }}-x86_64-apple-darwin
       - uses: actions/download-artifact@master
         with:
-          name: ${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-x86_64-pc-windows-msvc
+          name: ${{ env.REPOSITORY }}-x86_64-pc-windows-msvc
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -241,27 +236,30 @@ jobs:
           release_name: 'Release ${{ steps.get_version.outputs.VERSION || ''0.0.0.0''}}'
           draft: false
           prerelease: false
+      - id: files
+        run: |
+          ls ./target
       - uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: '${{ secrets.ACTIONS_TOKEN }}'
         with:
           upload_url: '${{ steps.create_release.outputs.upload_url }}'
-          asset_path: ./${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-x86_64-unknown-linux-gnu/${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}
-          asset_name: ${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-x86_64-unknown-linux-gnu
+          asset_path: ./${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu/${{ env.REPOSITORY }}
+          asset_name: ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu
           asset_content_type: application/octet-stream
       - uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: '${{ secrets.ACTIONS_TOKEN }}'
         with:
           upload_url: '${{ steps.create_release.outputs.upload_url }}'
-          asset_path: ./${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-x86_64-apple-darwin/${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}
-          asset_name: ${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-x86_64-apple-darwin
+          asset_path: ./x86_64-apple-darwin/${{ env.REPOSITORY }}
+          asset_name: ${{ env.REPOSITORY }}-x86_64-apple-darwin
           asset_content_type: application/octet-stream
       - uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: '${{ secrets.ACTIONS_TOKEN }}'
         with:
           upload_url: '${{ steps.create_release.outputs.upload_url }}'
-          asset_path: ./${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-x86_64-pc-windows-msvc/${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}.exe
-          asset_name:  ${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-x86_64-pc-windows-msvc.exe
+          asset_path: ./${{ env.REPOSITORY }}-x86_64-pc-windows-msvc/${{ env.REPOSITORY }}.exe
+          asset_name:  ${{ env.REPOSITORY }}-x86_64-pc-windows-msvc.exe
           asset_content_type: application/octet-stream
