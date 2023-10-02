@@ -222,7 +222,7 @@ jobs:
           args: 'toml-cli'
       - run: |
           TEMP_FILE="$(mktemp)"
-          toml set Cargo.toml package.version "${VERSION:1}" > "$TEMP_FILE"
+          toml set Cargo.toml package.version "${VERSION:-1.0}" > "$TEMP_FILE"
           mv "$TEMP_FILE" Cargo.toml
         shell: bash
         env:
