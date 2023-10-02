@@ -233,7 +233,7 @@ jobs:
           prerelease: false
       - id: files
         run: |
-          ls ./target
+          ls .
       - uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: '${{ secrets.ACTIONS_TOKEN }}'
