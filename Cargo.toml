@@ -1,6 +1,6 @@
 [package]
 name = "byteme"
-version = "0.1.0"
+version = "1.0"
 edition = "2021"
 license = "apache-2.0"
 authors = ["mpw <x@mpw.sh>"]
