@@ -41,8 +41,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest
-          - os: macos-latest-large
+          - os: macos-latest-xlarge
           - os: ubuntu-latest
           - os: windows-latest
     steps:
