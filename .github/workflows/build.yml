@@ -41,7 +41,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest-large
+          - os: macos-latest
           - os: macos-latest-xlarge
           - os: ubuntu-latest
           - os: windows-latest
@@ -138,7 +138,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest-large
+          - os: macos-latest
             target: x86_64-apple-darwin
             suffix: ''
           - os: macos-latest-xlarge
