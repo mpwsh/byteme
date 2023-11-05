@@ -10,7 +10,6 @@ concurrency:
 
 env:
   REPOSITORY: ${{ github.event.repository.name }}
-  BINARY_NAME: byteme
 
 jobs:
   build:
@@ -59,10 +58,6 @@ jobs:
           command: build
           args: '--release'
 
-      - name: Rename binary
-        run: |
-          cp ./target/release/${{ env.BINARY_NAME }}${{matrix.suffix}} ./target/release/${{ env.REPOSITORY }}${{ matrix.suffix }}
-
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ env.REPOSITORY }}-${{ matrix.target }}
@@ -94,6 +89,6 @@ jobs:
           draft: true
           fail_on_unmatched_files: true
           files: |
-            ${{ env.BINARY_NAME }}-x86_64-apple-darwin
-            ${{ env.BINARY_NAME }}-x86_64-unknown-linux-gnu
-            ${{ env.BINARY_NAME }}-x86_64-pc-windows.exe
+            ${{ env.REPOSITORY }}-x86_64-apple-darwin
+            ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu
+            ${{ env.REPOSITORY }}-x86_64-pc-windows.exe
