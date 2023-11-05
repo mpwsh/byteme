@@ -21,9 +21,6 @@ jobs:
           - os: macos-latest
             target: x86_64-apple-darwin
             suffix: ''
-          - os: macos-latest-xlarge
-            target: aarch64-apple-darwin
-            suffix: ''
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             suffix: ''
@@ -87,7 +84,6 @@ jobs:
             mv ${{ env.REPOSITORY }}-x86_64-apple-darwin/${{ env.REPOSITORY }} byteme-x86_64-apple-darwin
             mv ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu/${{ env.REPOSITORY }} byteme-x86_64-unknown-linux-gnu
             mv ${{ env.REPOSITORY }}-x86_64-pc-windows-msvc/${{ env.REPOSITORY }}.exe byteme-x86_64-pc-windows.exe
-            mv ${{ env.REPOSITORY }}-aarch64-apple-darwin/${{ env.REPOSITORY }} byteme-aarch64-apple-darwin
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -101,4 +97,3 @@ jobs:
             byteme-x86_64-apple-darwin
             byteme-x86_64-unknown-linux-gnu
             byteme-x86_64-pc-windows.exe
-            byteme-aarch64-apple-darwin
