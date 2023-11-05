@@ -76,9 +76,9 @@ jobs:
 
       - name: Move binaries
         run: |
-            mv ${{ env.REPOSITORY }}-x86_64-apple-darwin/${{ env.REPOSITORY }} byteme-x86_64-apple-darwin
-            mv ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu/${{ env.REPOSITORY }} byteme-x86_64-unknown-linux-gnu
-            mv ${{ env.REPOSITORY }}-x86_64-pc-windows-msvc/${{ env.REPOSITORY }}.exe byteme-x86_64-pc-windows.exe
+            mv -f ${{ env.REPOSITORY }}-x86_64-apple-darwin/${{ env.REPOSITORY }} ${{ env.REPOSITORY }}-x86_64-apple-darwin
+            mv -f ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu/${{ env.REPOSITORY }} ${{ env.REPOSITORY}}-x86_64-unknown-linux-gnu
+            mv -f ${{ env.REPOSITORY }}-x86_64-pc-windows-msvc/${{ env.REPOSITORY }}.exe ${{ env.REPOSITORY}}-x86_64-pc-windows.exe
 
       - name: Release
         uses: softprops/action-gh-release@v1
