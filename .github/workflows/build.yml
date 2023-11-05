@@ -76,9 +76,10 @@ jobs:
 
       - name: Move binaries
         run: |
-            mv -f ${{ env.REPOSITORY }}-x86_64-apple-darwin/${{ env.REPOSITORY }} ./byteme-x86_64-apple-darwin
-            mv -f ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu/${{ env.REPOSITORY }} ./byteme-x86_64-unknown-linux-gnu
-            mv -f ${{ env.REPOSITORY }}-x86_64-pc-windows-msvc/${{ env.REPOSITORY }}.exe ./byteme-x86_64-pc-windows.exe
+            rm -rf bin && mkdir bin
+            mv -f ${{ env.REPOSITORY }}-x86_64-apple-darwin/${{ env.REPOSITORY }} ./bin/${{ env.REPOSITORY }}-x86_64-apple-darwin
+            mv -f ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu/${{ env.REPOSITORY }} ./bin/${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu
+            mv -f ${{ env.REPOSITORY }}-x86_64-pc-windows-msvc/${{ env.REPOSITORY }}.exe ./bin/${{ env.REPOSITORY }}-x86_64-pc-windows.exe
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -89,6 +90,6 @@ jobs:
           draft: true
           fail_on_unmatched_files: true
           files: |
-            ${{ env.REPOSITORY }}-x86_64-apple-darwin
-            ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu
-            ${{ env.REPOSITORY }}-x86_64-pc-windows.exe
+            ./bin/${{ env.REPOSITORY }}-x86_64-apple-darwin
+            ./bin/${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu
+            ./bin/${{ env.REPOSITORY }}-x86_64-pc-windows.exe
