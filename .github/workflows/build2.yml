@@ -10,7 +10,7 @@ concurrency:
 
 env:
   REPOSITORY: ${{ github.event.repository.name }}
-  BINARY_NAME: hub
+  BINARY_NAME: byteme
 
 jobs:
   build:
@@ -94,6 +94,6 @@ jobs:
           draft: true
           fail_on_unmatched_files: true
           files: |
-            byteme-x86_64-apple-darwin
-            byteme-x86_64-unknown-linux-gnu
-            byteme-x86_64-pc-windows.exe
+            ${{ env.BINARY_NAME }}-x86_64-apple-darwin
+            ${{ env.BINARY_NAME }}-x86_64-unknown-linux-gnu
+            ${{ env.BINARY_NAME }}-x86_64-pc-windows.exe
