@@ -1,8 +1,8 @@
 name: Build and release binary
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*.*.*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -12,6 +12,12 @@ env:
   REPOSITORY: ${{ github.event.repository.name }}
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test
   build:
     runs-on: "${{ matrix.os }}"
     strategy:
@@ -41,6 +47,14 @@ jobs:
             target: x86_64-pc-windows-msvc
             suffix: .exe
             use_cross: false
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            suffix: ""
+            use_cross: true
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            suffix: ""
+            use_cross: true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -90,12 +104,11 @@ jobs:
       - name: Move binaries
         run: |
           rm -rf bin && mkdir bin
-          mv -f ${{ env.REPOSITORY }}-x86_64-apple-darwin/${{ env.REPOSITORY }} ./bin/${{ env.REPOSITORY }}-x86_64-apple-darwin
-          mv -f ${{ env.REPOSITORY }}-aarch64-apple-darwin/${{ env.REPOSITORY }} ./bin/${{ env.REPOSITORY }}-aarch64-apple-darwin
-          mv -f ${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu/${{ env.REPOSITORY }} ./bin/${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu
-          mv -f ${{ env.REPOSITORY }}-aarch64-unknown-linux-gnu/${{ env.REPOSITORY }} ./bin/${{ env.REPOSITORY }}-aarch64-unknown-linux-gnu
-          mv -f ${{ env.REPOSITORY }}-armv7-unknown-linux-musleabihf/${{ env.REPOSITORY }} ./bin/${{ env.REPOSITORY }}-armv7-unknown-linux-musleabihf
-          mv -f ${{ env.REPOSITORY }}-x86_64-pc-windows-msvc/${{ env.REPOSITORY }}.exe ./bin/${{ env.REPOSITORY }}-x86_64-pc-windows.exe
+          for dir in ${{ env.REPOSITORY }}-*/; do
+            for file in "$dir"*; do
+              mv -f "$file" ./bin/"$(basename "$dir" /)"${file##*${{ env.REPOSITORY }}}
+            done
+          done
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -105,10 +118,4 @@ jobs:
           generate_release_notes: true
           draft: true
           fail_on_unmatched_files: true
-          files: |
-            ./bin/${{ env.REPOSITORY }}-x86_64-apple-darwin
-            ./bin/${{ env.REPOSITORY }}-aarch64-apple-darwin
-            ./bin/${{ env.REPOSITORY }}-x86_64-unknown-linux-gnu
-            ./bin/${{ env.REPOSITORY }}-aarch64-unknown-linux-gnu
-            ./bin/${{ env.REPOSITORY }}-armv7-unknown-linux-musleabihf
-            ./bin/${{ env.REPOSITORY }}-x86_64-pc-windows.exe
+          files: ./bin/*
