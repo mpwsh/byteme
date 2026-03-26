@@ -10,28 +10,72 @@ use z85::{decode, encode};
 
 pub const CHUNK_SIZE: usize = 1024 * 100;
 
-pub fn from_raw(arg: &str) -> Result<()> {
+pub fn from_raw(input: Option<&str>, output: Option<&str>) -> Result<()> {
     let mut buffer = Vec::new();
-    io::stdin().lock().read_to_end(&mut buffer)?;
 
-    let raw = str::from_utf8(&buffer)?.replace('\n', "");
-    let decompressed = decompress(&decode(raw)?)?;
+    match input {
+        Some(path) => {
+            let mut f = File::open(path).with_context(|| format!("cannot open '{}'", path))?;
+            f.read_to_end(&mut buffer)?;
+        },
+        None => {
+            io::stdin().lock().read_to_end(&mut buffer)?;
+        },
+    }
 
-    let mut file = File::create(arg)?;
-    Ok(file.write_all(&decompressed)?)
+    let raw = str::from_utf8(&buffer)
+        .context("input is not valid z85 text (did you mean 'encode'?)")?
+        .replace('\n', "");
+
+    let decompressed = decompress(
+        &decode(raw).context("failed to decode z85 (input may be corrupted or not z85 encoded)")?,
+    )
+    .context("failed to decompress (data may be corrupted)")?;
+
+    match output {
+        Some(path) => {
+            let mut file =
+                File::create(path).with_context(|| format!("cannot create '{}'", path))?;
+            file.write_all(&decompressed)?;
+        },
+        None => {
+            io::stdout().lock().write_all(&decompressed)?;
+        },
+    }
+
+    Ok(())
 }
 
-pub fn to_raw(arg: &str) -> Result<()> {
+pub fn to_raw(input: Option<&str>, output: Option<&str>) -> Result<()> {
     let mut data = Vec::new();
-    let mut f = File::open(arg).context("Error while reading file")?;
-    f.read_to_end(&mut data)?;
 
-    let compressed = compress(&data)?;
+    match input {
+        Some(path) => {
+            let mut f = File::open(path).with_context(|| format!("cannot open '{}'", path))?;
+            f.read_to_end(&mut data)?;
+        },
+        None => {
+            io::stdin().lock().read_to_end(&mut data)?;
+        },
+    }
+
+    let compressed = compress(&data).context("failed to compress input")?;
     let encoded = encode(compressed);
-    let mut lock = io::stdout().lock();
 
-    for chunk in encoded.as_bytes().chunks(CHUNK_SIZE) {
-        lock.write_all(chunk)?;
+    match output {
+        Some(out_path) => {
+            let mut file =
+                File::create(out_path).with_context(|| format!("cannot create '{}'", out_path))?;
+            file.write_all(encoded.as_bytes())?;
+        },
+        None => {
+            let mut lock = io::stdout().lock();
+            encoded
+                .as_bytes()
+                .chunks(CHUNK_SIZE)
+                .try_for_each(|chunk| lock.write_all(chunk))
+                .context("failed to write to stdout")?;
+        },
     }
 
     Ok(())

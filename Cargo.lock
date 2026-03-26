@@ -16,11 +16,12 @@ checksum = "98161a4e3e2184da77bb14f02184cdd111e83bbbcc9979dfee3c44b9a85f5602"
 
 [[package]]
 name = "byteme"
-version = "1.0.1"
+version = "1.1.0"
 dependencies = [
  "anyhow",
  "flate2",
  "itertools",
+ "lexopt",
  "z85",
 ]
 
@@ -63,6 +64,12 @@ checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
 dependencies = [
  "either",
 ]
+
+[[package]]
+name = "lexopt"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "803ec87c9cfb29b9d2633f20cba1f488db3fd53f2158b1024cbefb47ba05d413"
 
 [[package]]
 name = "miniz_oxide"

@@ -1,6 +1,6 @@
 [package]
 name = "byteme"
-version = "1.0.1"
+version = "1.1.0"
 edition = "2024"
 license = "apache-2.0"
 authors = ["mpw <x@mpw.sh>"]
@@ -9,4 +9,5 @@ authors = ["mpw <x@mpw.sh>"]
 anyhow = "1.0"
 flate2 = "1.1"
 itertools = "0.14"
+lexopt = "0.3.2"
 z85 = "3.0.7"
