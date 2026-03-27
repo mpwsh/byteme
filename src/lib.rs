@@ -17,10 +17,10 @@ pub fn from_raw(input: Option<&str>, output: Option<&str>) -> Result<()> {
         Some(path) => {
             let mut f = File::open(path).with_context(|| format!("cannot open '{}'", path))?;
             f.read_to_end(&mut buffer)?;
-        },
+        }
         None => {
             io::stdin().lock().read_to_end(&mut buffer)?;
-        },
+        }
     }
 
     let raw = str::from_utf8(&buffer)
@@ -37,10 +37,10 @@ pub fn from_raw(input: Option<&str>, output: Option<&str>) -> Result<()> {
             let mut file =
                 File::create(path).with_context(|| format!("cannot create '{}'", path))?;
             file.write_all(&decompressed)?;
-        },
+        }
         None => {
             io::stdout().lock().write_all(&decompressed)?;
-        },
+        }
     }
 
     Ok(())
@@ -53,10 +53,10 @@ pub fn to_raw(input: Option<&str>, output: Option<&str>) -> Result<()> {
         Some(path) => {
             let mut f = File::open(path).with_context(|| format!("cannot open '{}'", path))?;
             f.read_to_end(&mut data)?;
-        },
+        }
         None => {
             io::stdin().lock().read_to_end(&mut data)?;
-        },
+        }
     }
 
     let compressed = compress(&data).context("failed to compress input")?;
@@ -67,7 +67,7 @@ pub fn to_raw(input: Option<&str>, output: Option<&str>) -> Result<()> {
             let mut file =
                 File::create(out_path).with_context(|| format!("cannot create '{}'", out_path))?;
             file.write_all(encoded.as_bytes())?;
-        },
+        }
         None => {
             let mut lock = io::stdout().lock();
             encoded
@@ -75,7 +75,7 @@ pub fn to_raw(input: Option<&str>, output: Option<&str>) -> Result<()> {
                 .chunks(CHUNK_SIZE)
                 .try_for_each(|chunk| lock.write_all(chunk))
                 .context("failed to write to stdout")?;
-        },
+        }
     }
 
     Ok(())

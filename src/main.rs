@@ -28,17 +28,17 @@ fn main() -> Result<()> {
         match arg {
             Short('o') | Long("output") => {
                 output = Some(parser.value()?.string()?);
-            },
+            }
             Short('h') | Long("help") => {
                 println!("{}", HELP);
                 return Ok(());
-            },
+            }
             Value(val) if command.is_none() => {
                 command = Some(val.string()?);
-            },
+            }
             Value(val) if file.is_none() => {
                 file = Some(val.string()?);
-            },
+            }
             _ => return Err(arg.unexpected().into()),
         }
     }
@@ -46,14 +46,14 @@ fn main() -> Result<()> {
     match command.as_deref() {
         Some("encode") => {
             to_raw(file.as_deref(), output.as_deref())?;
-        },
+        }
         Some("decode") => {
             from_raw(file.as_deref(), output.as_deref())?;
-        },
+        }
         Some(other) => anyhow::bail!("unknown command '{}'\n\n{}", other, HELP),
         None => {
             println!("{}", HELP);
-        },
+        }
     }
 
     Ok(())
