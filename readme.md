@@ -1,36 +1,44 @@
 ## Description
 
-Compress/Decompress, Encode and Decode any file to a z85 string.  
+Compress/Decompress, Encode and Decode any file to a z85 string.
 Useful to store binaries in text format, for NFC cards/stickers/keychains or anywhere you want.
 
 ## Build
 
 ```bash
-#Build
-❯ cargo build --release
+cargo build --release
 ```
 
 ## Usage
 
-Compress a file and encode bytes to z85
-
 ```bash
-#Create a test file
-echo "This is a test" >> raw.txt
-#Process
-❯ ./target/release/byteme raw.txt
-#Output
-C?JLE:sHu(Qc%Y#!z.8[04z%)###00
+# Encode a file to z85 (stdout)
+byteme encode raw.txt
+
+# Encode and save to file
+byteme encode raw.txt -o encoded.txt
+
+# Pipe into encode
+cat myimage.png | byteme encode -o encoded.txt
+
+# Decode from file
+byteme decode encoded.txt
+
+# Decode and save to file
+byteme decode encoded.txt -o raw.txt
+
+# Pipe into decode
+echo 'C?JLE:sHu(Qc%Y#!z.8[04z%)###00' | byteme decode
+
+# Pipe into decode and save to file
+echo 'C?JLE:sHu(Qc%Y#!z.8[04z%)###00' | byteme decode -o raw.txt
 ```
 
-Decode z85 and decompress back to original file
+## Options
 
-```bash
-#Decode
-❯ echo 'C?JLE:sHu(Qc%Y#!z.8[04z%)###00' | ./target/release/byteme out.txt
-#Check your new file
-❯ cat out.txt
-This is a test
+```
+-o, --output <path>   Write to file instead of stdout
+-h, --help            Show help message
 ```
 
 ## Encryption
@@ -38,10 +46,10 @@ This is a test
 Encrypt a file using `gpg` and process with `byteme`
 
 ```bash
-#Interactive mode
-❯ gpg -c --no-symkey-cache raw.txt
-#No interactive mode
-❯ gpg --batch --passphrase 'somepass' -c raw.txt
+# Interactive mode
+gpg -c --no-symkey-cache raw.txt
+# Non-interactive mode
+gpg --batch --passphrase 'somepass' -c raw.txt
 ```
 
 Now run the steps above but using `<filename>.gpg` instead.
@@ -49,5 +57,5 @@ Now run the steps above but using `<filename>.gpg` instead.
 ## Decryption
 
 ```bash
-❯ gpg -d raw.txt.gpg
+gpg -d raw.txt.gpg
 ```
