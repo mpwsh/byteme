@@ -1,6 +1,6 @@
 [package]
 name = "byteme"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Compress/Decompress, Encode and Decode any file to a z85 string"
@@ -22,3 +22,11 @@ missing_docs = "warn"
 [lints.clippy]
 all = { level = "deny", priority = -1 }
 pedantic = { level = "warn", priority = -1 }
+
+
+[profile.release]
+strip = true       
+lto = true        
+codegen-units = 1
+panic = "abort" 
+opt-level = "s"
