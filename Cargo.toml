@@ -2,12 +2,23 @@
 name = "byteme"
 version = "1.1.0"
 edition = "2024"
-license = "apache-2.0"
+rust-version = "1.85"
+description = "Compress/Decompress, Encode and Decode any file to a z85 string"
+license = "Apache-2.0"
+repository = "https://github.com/mpwsh/byteme"
+readme = "readme.md"
 authors = ["mpw <x@mpw.sh>"]
 
 [dependencies]
 anyhow = "1.0"
 flate2 = "1.1"
-itertools = "0.14"
 lexopt = "0.3.2"
+thiserror = "2.0.20"
 z85 = "3.0.7"
+
+[lints.rust]
+missing_docs = "warn"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
